@@ -241,7 +241,7 @@ public class SudokuSolver extends JFrame {
 	 * Check if a value contains in its 3x3 box for a cell.
 	 * @param row current row index.
 	 * @param col current column index.
-	 * @return true if this cell is correct or not duplicated in its 3x3 box.
+	 * @return true if this cell is incorrect or duplicated in its 3x3 box.
 	 */
 	private boolean containedIn3x3Box(int row, int col, int value) {
 		// Find the top left of its 3x3 box to start validating from
@@ -267,7 +267,7 @@ public class SudokuSolver extends JFrame {
 	 * @param row current row index.
 	 * @param col current column index.
 	 * @param value value in this cell.
-	 * @return true if this value is not duplicated in its row and column.
+	 * @return true if this value is duplicated in its row and column.
 	 */
 	private boolean containedInRowCol(int row, int col, int value) {
 		for (int i = 0; i < 9; i++) {
