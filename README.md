@@ -1,6 +1,6 @@
 <h3>Sudoku Solver</h3><br />
 Developer: Miga<br />
-Version:Å@1.0<br />
+Version:Å@1.1<br />
 11/22/2012
 
 <p>This Java program will validate and solve Sudoku. 
@@ -24,5 +24,6 @@ you can type those numbers in and let the program solve.</p>
 <hr />
 *Changelog*
 <ul>
+<li>06/14/2013 v1.1 attempt to clean the code.</li>
 <li>11/22/2012 v1.0 released.</li>
 </ul>
