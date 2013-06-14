@@ -24,6 +24,6 @@ you can type those numbers in and let the program solve.</p>
 <hr />
 *Changelog*
 <ul>
-<li>06/14/2013 v1.1 attempt to clean the code.</li>
+<li>06/14/2013 v1.1 attempted to clean the code.</li>
 <li>11/22/2012 v1.0 released.</li>
 </ul>
