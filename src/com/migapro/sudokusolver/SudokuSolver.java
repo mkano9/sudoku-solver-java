@@ -47,9 +47,9 @@ public class SudokuSolver extends JFrame implements ActionListener {
 	 */
 	public SudokuSolver() {
 		super("Sudoku Solver");
-		
+
 		prepareSudokuUI();
-		
+
 		// JFrame property
 		setLayout(new FlowLayout(FlowLayout.CENTER));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,7 +59,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		setResizable(false);
 		setVisible(true);
 	}
-	
+
 	/**
 	 * Set up the UI for application.
 	 */
@@ -67,11 +67,11 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		// Used to align the title, Sudoku grid, and button panels vertically
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		
+
 		// Title panel
 		JPanel title = new JPanel();
 		title.add(new JLabel(new ImageIcon(getClass().getResource("/resources/title.png"))));
-		
+
 		// Sudoku grid panel
 		JPanel sudokuPanel = new JPanel();
 		sudokuPanel.setLayout(new GridLayout(3, 3, 1, 1));
@@ -79,7 +79,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		// Set up 9 3x3 box panels
 		JPanel[] boxes = new JPanel[9];
 		boxes = prepare3x3BoxUI(sudokuPanel, boxes);
-		
+
 		// Set up SudokuCells
 		cellValues = new int[9][9];
 		sudokuCells = new SudokuCell[9][9];
@@ -92,35 +92,35 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		JButton solveButton = new JButton("Solve"); // Solve the Sudoku
 		JButton eraseButton = new JButton("Erase"); // Clear the cells that are not fixed
 		JButton eraseAllButton = new JButton("Erase All"); // Clear all cells including fixed ones
-		
+
 		buttonsPanel.add(submitButton);
 		buttonsPanel.add(solveButton);
 		buttonsPanel.add(eraseButton);
 		buttonsPanel.add(eraseAllButton);
-		
+
 		// Second row of buttons
 		JPanel buttonsPanel2 = new JPanel();
 		JButton presetButton = new JButton("Mark As Preset"); // Set filled cells as preset (not editable)
-		
+
 		buttonsPanel2.add(presetButton);
-		
+
 		submitButton.addActionListener(this);
 		solveButton.addActionListener(this);
 		presetButton.addActionListener(this);
 		eraseButton.addActionListener(this);
 		eraseAllButton.addActionListener(this);
-		
+
 		panel.add(title);
 		panel.add(sudokuPanel);
 		panel.add(buttonsPanel);
 		panel.add(buttonsPanel2);
 		add(panel);
 	}
-	
+
 	/**
 	 * Set up 9 3x3 panels for Sudoku panel.
 	 * Use 9 panels to align as 3x3 boxes.
-	 * @param sudokuPanel 
+	 * @param sudokuPanel
 	 * @param boxes 3x3 box panels to be added on Sudoku panel.
 	 * @return instantiated 3x3 box panels.
 	 */
@@ -131,10 +131,10 @@ public class SudokuSolver extends JFrame implements ActionListener {
 			boxes[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
 			sudokuPanel.add(boxes[i]);
 		}
-		
+
 		return boxes;
 	}
-	
+
 	/**
 	 * Set up cells UI(SudokuCell) for input and add them to the panels.
 	 * SudokuCells have to be added to proper panels meaning left-right and top-bottom order within 3x3 box.
@@ -142,7 +142,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 	 */
 	private void prepareSudokuCellsUI(JPanel[] boxes) {
 		int index = 0;
-		
+
 		// Adjust current row
 		for (int i = 0; i < 9; i++) {
 			if (i <= 2)
@@ -151,70 +151,84 @@ public class SudokuSolver extends JFrame implements ActionListener {
 				index = 3;
 			else
 				index = 6;
-			
+
 			for (int j = 0; j < 9; j++) {
 				sudokuCells[i][j] = new SudokuCell(i, j);
 				boxes[index + (j / 3)].add(sudokuCells[i][j]);
 			}
 		}
 	}
-	
+	//verbetering Groep17 #1
+	Thread t1 = new Thread();
+
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		JButton button = (JButton) event.getSource();
 		String buttonType = button.getText();
-		
-		if (buttonType.equals("Submit"))
-			submitSudoku();
-		else if (buttonType.equals("Solve"))
-			startSolving();
-		else if (buttonType.equals("Erase"))
-			erase();
-		else if (buttonType.equals("Erase All"))
-			eraseAllIncludingPresetCells();
-		else
-			checkPresetCells();
+
+		//verbetering Groep17 #1
+		if(!t1.isAlive()) {
+			t1 = new Thread() {
+
+				public void run() {
+					if (buttonType.equals("Submit"))
+						submitSudoku();
+					else if (buttonType.equals("Solve"))
+						startSolving();
+					else if (buttonType.equals("Erase"))
+						erase();
+					else if (buttonType.equals("Erase All"))
+						eraseAllIncludingPresetCells();
+					else
+						checkPresetCells();
+				}
+			};
+
+			t1.start();
+
+		}
+
 	}
-	
+
 	/**
 	 * Submit current Sudokue to validate for completeness.
 	 */
 	private void submitSudoku() {
 		if (isSudokuSolved())
-			JOptionPane.showMessageDialog(getRootPane(), 
-					"<html><center>Congratulations!<br>Sudoku has been Completed!</center></html>", 
+			JOptionPane.showMessageDialog(getRootPane(),
+					"<html><center>Congratulations!<br>Sudoku has been Completed!</center></html>",
 					"Sudoku Validation", JOptionPane.INFORMATION_MESSAGE);
 		else
-			JOptionPane.showMessageDialog(getRootPane(), 
-					"<html><center>Failed!<br>Sudoku is not complete!</center></html>", 
+			JOptionPane.showMessageDialog(getRootPane(),
+					"<html><center>Failed!<br>Sudoku is not complete!</center></html>",
 					"Sudoku Validation", JOptionPane.INFORMATION_MESSAGE);
 	}
-	
+
 	/**
 	 * Start working on the Sudoku if it is ready.
 	 */
 	private void startSolving() {
 		// Don't do anything if Sudoku is already full
 		if (isSudokuFull()) {
-			JOptionPane.showMessageDialog(getRootPane(), 
-					"<html><center>There are no cells open to start from.</center></html>", 
+			JOptionPane.showMessageDialog(getRootPane(),
+					"<html><center>There are no cells open to start from.</center></html>",
 					"Solving Sudoku", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		// Validate before starting
 		if (isValidToStart()) {
 			markAsPresetCells();
 			if (!solve(0, 0))
-				JOptionPane.showMessageDialog(getRootPane(), 
-						"<html><center>Unable to solve.</center></html>", 
+				JOptionPane.showMessageDialog(getRootPane(),
+						"<html><center>Unable to solve.</center></html>",
 						"Solving Sudoku", JOptionPane.ERROR_MESSAGE);
 		} else // Don't start solving if Sudoku is not valid at the start
-			JOptionPane.showMessageDialog(getRootPane(), 
-					"<html><center>This is not a valid Sudoku to start.</center></html>", 
+			JOptionPane.showMessageDialog(getRootPane(),
+					"<html><center>This is not a valid Sudoku to start.</center></html>",
 					"Solving Sudoku", JOptionPane.ERROR_MESSAGE);
 	}
-	
+
 	/**
 	 * Erase all editable cells.
 	 */
@@ -229,7 +243,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 				}
 			}
 	}
-	
+
 	/**
 	 * Erase all cell values including those with fixed values.
 	 */
@@ -247,20 +261,20 @@ public class SudokuSolver extends JFrame implements ActionListener {
 				}
 			}
 	}
-	
+
 	/**
 	 * Evaluate cells before making pre filled cells fixed.
 	 */
 	private void checkPresetCells() {
 		// Validate the current state and make the filled cells fixed
 		if (!isValidToStart())
-			JOptionPane.showMessageDialog(getRootPane(), 
-					"<html><center>This is not a valid Sudoku to start.</center></html>", 
+			JOptionPane.showMessageDialog(getRootPane(),
+					"<html><center>This is not a valid Sudoku to start.</center></html>",
 					"Sudoku Solver", JOptionPane.ERROR_MESSAGE);
 		else
 			markAsPresetCells();
 	}
-	
+
 	/**
 	 * Check if the Sudoku puzzle is solved correctly.
 	 * @return true if Sudoku is correct.
@@ -269,28 +283,28 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		for (int i = 0; i < 9; i++) {
 			int[] aRow = new int[9];
 			int[] aCol = new int[9];
-			
+
 			for (int j = 0; j < 9; j++) {
 				// If this cell is empty, quit because it's not complete
 				if (cellValues[i][j] == 0)
 					return false;
-				
+
 				aRow[j] = cellValues[i][j];
 				aCol[j] = cellValues[j][i];
-				
+
 				// Check if the value in this cell is duplicated in 3x3 box
 				if (isContainedIn3x3Box(i, j, cellValues[i][j]))
 					return false;
 			}
-			
+
 			// Check rows and columns
 			if (!isRowColumnCorrect(aRow, aCol))
 				return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Check if specified row and column are correct.
 	 * Used when submitting the puzzle.
@@ -301,14 +315,14 @@ public class SudokuSolver extends JFrame implements ActionListener {
 	private boolean isRowColumnCorrect(int[] aRow, int[] aCol) {
 		Arrays.sort(aRow);
 		Arrays.sort(aCol);
-		
+
 		for (int i = 0; i < 9; i++)
 			if (aRow[i] != i + 1 && aCol[i] != i + 1)
 				return false;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Check if Sudoku is in valid condition to start.
 	 * @return true if Sudoku is ready to start.
@@ -320,10 +334,10 @@ public class SudokuSolver extends JFrame implements ActionListener {
 					if (isContainedIn3x3Box(i, j, cellValues[i][j]) ||
 							isContainedInRowColumn(i, j, cellValues[i][j]))
 						return false;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Make the filled cells fixed.
 	 */
@@ -338,7 +352,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 						sudokuCells[i][j].setForeground(new Color(150, 150, 150));
 					}
 	}
-	
+
 	/**
 	 * Check if a value contains in its 3x3 box for a cell.
 	 * @param row current row index.
@@ -349,7 +363,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		// Find the top left of its 3x3 box to start validating from
 		int startRow = row / 3 * 3;
 		int startCol = col / 3 * 3;
-		
+
 		// Check within its 3x3 box except its cell
 		for (int i = startRow; i < startRow + 3; i++)
 			for (int j = startCol; j < startCol + 3; j++)
@@ -359,7 +373,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 
 		return false;
 	}
-	
+
 	/**
 	 * Check if a value is contained within its row and column.
 	 * Used when solving the puzzle.
@@ -378,10 +392,10 @@ public class SudokuSolver extends JFrame implements ActionListener {
 				if (cellValues[i][col] == value)
 					return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Check if all cells are filled up.
 	 * @return true if Sudoku is full.
@@ -391,10 +405,10 @@ public class SudokuSolver extends JFrame implements ActionListener {
 			for (int j = 0; j < 9; j++)
 				if (cellValues[i][j] == 0)
 					return false;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Solve Sudoku recursively.
 	 * @param row current row index.
@@ -405,7 +419,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		// If it has passed through all cells, start quitting
 		if (row == 9)
 			return true;
-		
+
 		// If this cell is already set(fixed), skip to the next cell
 		if (cellValues[row][col] != 0) {
 			if (solve(col == 8? (row + 1): row, (col + 1) % 9))
@@ -414,17 +428,17 @@ public class SudokuSolver extends JFrame implements ActionListener {
 			// Random numbers 1 - 9
 			Integer[] randoms = generateRandomNumbers();
 			for (int i = 0; i < 9; i++) {
-				
+
 				// If no duplicates in this row, column, 3x3, assign the value and go to the next
 				if (!isContainedInRowColumn(row, col, randoms[i]) &&
 						!isContainedIn3x3Box(row, col, randoms[i])) {
 					cellValues[row][col] = randoms[i];
 					sudokuCells[row][col].setText(String.valueOf(randoms[i]));
-					
+
 					// Move to the next cell left-to-right and top-to-bottom
 					if (solve(col == 8? (row + 1) : row, (col + 1) % 9))
 						return true;
-					else { 
+					else {
 						// Initialize the cell when backtracking (case when the value in the next cell was not valid)
 						cellValues[row][col] = 0;
 						sudokuCells[row][col].setText("");
@@ -432,10 +446,10 @@ public class SudokuSolver extends JFrame implements ActionListener {
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Generate 9 unique random numbers.
 	 * @return array containing 9 random unique numbers.
@@ -445,10 +459,10 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		for (int i = 0; i < 9; i++)
 			randoms.add(i + 1);
 		Collections.shuffle(randoms);
-		
+
 		return randoms.toArray(new Integer[9]);
 	}
-	
+
 	/**
 	 * A SudokuCell represents a cell for input.
 	 * @author Miga
@@ -458,7 +472,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 
 		/** UID */
 		private static final long serialVersionUID = 4690751052748480438L;
-		
+
 		/** Determine if this cell can accept input. */
 		private boolean editable;
 
@@ -469,15 +483,15 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		 */
 		public SudokuCell(final int row, final int col) {
 			super(1);
-			
+
 			editable = true;
-			
+
 			setBackground(Color.WHITE);
 			setBorder(BorderFactory.createLineBorder(Color.GRAY));
 			setHorizontalAlignment(CENTER);
 			setPreferredSize(new Dimension(35, 35));
 			setFont(new Font("Lucida Console", Font.BOLD, 28));
-			
+
 			addFocusListener(new FocusListener(){
 
 				@Override
@@ -504,7 +518,7 @@ public class SudokuSolver extends JFrame implements ActionListener {
 					// Set the previous color of fields back to white
 					int startRow = row / 3 * 3;
 					int startCol = col / 3 * 3;
-					
+
 					// Reset focus (set background color back to white)
 					for (int i = 0; i < 9; i++) {
 						// Horizontal
@@ -512,17 +526,17 @@ public class SudokuSolver extends JFrame implements ActionListener {
 						// Vertical
 						sudokuCells[row][i].setBackground(Color.WHITE);
 					}
-					
+
 					// 3x3 box
 					for (int i = startRow; i < startRow + 3; i++)
 						for (int j = startCol; j < startCol + 3; j++)
 							sudokuCells[i][j].setBackground(Color.WHITE);
 				}
-				
+
 			});
-			
+
 			addKeyListener(new KeyAdapter() {
-				
+
 				@Override
 				public void keyPressed(KeyEvent e) {
 					// Only allow numeric input
@@ -537,28 +551,28 @@ public class SudokuSolver extends JFrame implements ActionListener {
 							cellValues[row][col] = 0;
 						} else
 							setEditable(false);
-					
+
 					// Navigation by arrow keys
 					switch (e.getKeyCode()) {
-					case KeyEvent.VK_DOWN:
-						sudokuCells[(row + 1) % 9][col].requestFocusInWindow();
-						break;
-					case KeyEvent.VK_RIGHT:
-						sudokuCells[row][(col + 1) % 9].requestFocusInWindow();
-						break;
-					case KeyEvent.VK_UP:
-						sudokuCells[(row == 0)? 8 : (row - 1)][col].requestFocusInWindow();
-						break;
-					case KeyEvent.VK_LEFT:
-						sudokuCells[row][(col == 0)? 8 : (col - 1)].requestFocusInWindow();
-						break;
+						case KeyEvent.VK_DOWN:
+							sudokuCells[(row + 1) % 9][col].requestFocusInWindow();
+							break;
+						case KeyEvent.VK_RIGHT:
+							sudokuCells[row][(col + 1) % 9].requestFocusInWindow();
+							break;
+						case KeyEvent.VK_UP:
+							sudokuCells[(row == 0)? 8 : (row - 1)][col].requestFocusInWindow();
+							break;
+						case KeyEvent.VK_LEFT:
+							sudokuCells[row][(col == 0)? 8 : (col - 1)].requestFocusInWindow();
+							break;
 					}
 				}
 			});
 		}
 
 	}
-	
+
 	/**
 	 * @param args
 	 */
