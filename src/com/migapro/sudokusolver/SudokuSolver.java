@@ -169,18 +169,25 @@ public class SudokuSolver extends JFrame implements ActionListener {
 		//verbetering Groep17 #1
 		if(!t1.isAlive()) {
 			t1 = new Thread() {
-
 				public void run() {
-					if (buttonType.equals("Submit"))
-						submitSudoku();
-					else if (buttonType.equals("Solve"))
-						startSolving();
-					else if (buttonType.equals("Erase"))
-						erase();
-					else if (buttonType.equals("Erase All"))
-						eraseAllIncludingPresetCells();
-					else
-						checkPresetCells();
+                    // verbetering groep17 #4
+					switch (buttonType){
+						case "Submit":
+							submitSudoku();
+							break;
+						case "Solve":
+							startSolving();
+							break;
+						case "Erase":
+							erase();
+							break;
+						case "Erase All":
+							eraseAllIncludingPresetCells();
+							break;
+						default:
+							checkPresetCells();
+							break;
+					}
 				}
 			};
 
